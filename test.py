@@ -74,8 +74,8 @@ class Int8Calibrator(trt.IInt8EntropyCalibrator2):
                     npy_file = self.image_paths[i + j]
                     img = np.load(npy_file).astype(np.float32)
 
-                if img.shape == (3, 640, 640):
-                    img = img.squeeze(0)
+                if img.shape == (1, 3, 640, 640):
+                    img = img.unsqueeze()
                 
                 batch.append(img)
 
@@ -91,11 +91,11 @@ class Int8Calibrator(trt.IInt8EntropyCalibrator2):
         try:
             # ✅ 从生成器获取数据
             data = next(self.batches)
-
             print(f"✅ Loaded batch, shape: {data.shape}")
 
             # ✅ 复制数据到 GPU
             cuda.memcpy_htod(self.device_input, data)
+            print(f"✅ Copy batch success.")
 
             # ✅ 返回 GPU 设备内存指针
             return [int(self.device_input)]
